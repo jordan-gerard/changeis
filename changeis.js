@@ -8,14 +8,6 @@ let coinCount = {
     nickel: 0,
     penny: 0
 };
-const coinCountReset = {
-    toonie: 0,
-    loonie: 0,
-    quarter: 0,
-    dime: 0,
-    nickel: 0,
-    penny: 0
-}
 
 // CONSTANTS / STRUCTURES
 //
@@ -141,6 +133,19 @@ function findLargestCoin(amount) {
     return result;
 }
 
+function resetCoinCount() {
+    coinCount = {
+        toonie: 0,
+        loonie: 0,
+        quarter: 0,
+        dime: 0,
+        nickel: 0,
+        penny: 0
+    }
+
+    return coinCount;
+}
+
 // ENTRY / UI HOOK
 //
 
@@ -150,8 +155,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
     if(changeBtn) {
         changeBtn.addEventListener("click", function(evt) {
-            evt.preventDefault();
-            coinCount = coinCountReset;
+            evt.preventDefault();          
             let inputElement = document.querySelector('#amountInput');
             let outputElement = document.querySelector('#output');
             if(outputElement) {
@@ -207,9 +211,9 @@ document.addEventListener("DOMContentLoaded", function(e) {
             if(coinCount.penny > 0) {
                 msg += `and ${coinCount.penny} penn`;
                 if(coinCount.penny > 1) {
-                    msg += `ies, `;
+                    msg += `ies.`;
                 } else {
-                    msg += 'y, ';
+                    msg += 'y.';
                 }
             }                             
 
@@ -226,6 +230,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
             if(outputElement) {
                 outputElement.innerHTML += msg;
             }
+            coinCount = resetCoinCount();            
         })
     }
 });
