@@ -1,82 +1,89 @@
-// MEMBERS / PRIVATE
-//
-let coinCount = {
-    toonie: 0,
-    loonie: 0,
-    quarter: 0,
-    dime: 0,
-    nickel: 0,
-    penny: 0
-};
-
-// CONSTANTS / STRUCTURES
-//
-
-const _TOONIE = {
-    name: 'toonie',
-    value: 200
-};
-const _LOONIE = {
-    name: 'loonie',
-    value: 100
-};
-const _QUARTER = {
-    name: 'quarter',
-    value: 25
-};
-const _DIME = {
-    name: 'dime',
-    value: 10
-};
-const _NICKEL = {
-    name: 'nickel',
-    value: 5
-};
-const _PENNY = {
-    name: 'penny',
-    value: 1
-};
-// const _COINS = [
-//     {
-//         name: 'toonie',
-//         value: 200
-//     },
-//     {
-//         name: 'loonie',
-//         value: 100
-//     },
-//     {
-//         name: 'quarter',
-//         value: 25
-//     },
-//     {
-//         name: 'dime',
-//         value: 10
-//     },
-//     {
-//         name: 'nickel',
-//         value: 5
-//     },
-//     {
-//         name: 'penny',
-//         value: 1
-//     }
-// ]
-
 // MAIN FUNCTION
 //
 
-function findAllCoins(amount) {
-    let result = [];
+function getChange(amount) {
+
+    // Coin structure and count
+    let coins = {
+        _TOONIE: {
+            name: {
+                single: 'toonie',
+                plural: 'toonies'
+            },
+            value: 200,
+            count: 0
+        },
+        _LOONIE: {
+            name: {
+                single: 'loonie',
+                plural: 'loonies'
+            },
+            value: 100,
+            count: 0
+        },
+        _QUARTER: {
+            name: {
+                single: 'quarter',
+                plural: 'quarters'
+            },
+            value: 25,
+            count: 0
+        },
+        _DIME: {
+            name: {
+                single: 'dime',
+                plural: 'dimes'
+            },
+            value: 10,
+            count: 0
+        },
+        _NICKEL: {
+            name: {
+                single: 'nickel',
+                plural: 'nickels'
+            },
+            value: 5,
+            count: 0
+        },
+        _PENNY: {
+            name: {
+                single: 'penny',
+                plural: 'pennies'
+            },
+            value: 1,
+            count: 0
+        }
+    };
 
     while(amount > 0) {
-        let largestCoin = findLargestCoin(amount);
-        if(largestCoin !== 0) {
-            result.push(largestCoin);
-            amount -= largestCoin.value;            
-        } else {
-            break;
-        }     
+        // Add largest coins and repeat until all change is determined
+        if(amount >= coins._TOONIE.value) {
+            coins._TOONIE.count += 1;
+            amount -= coins._TOONIE.value;
+        } else if(amount >= coins._LOONIE.value) {
+            coins._LOONIE.count += 1;
+            amount -= coins._LOONIE.value;
+        } else if(amount >= coins._QUARTER.value) {
+            coins._QUARTER.count += 1;
+            amount -= coins._QUARTER.value;
+        } else if(amount >= coins._DIME.value) {
+            coins._DIME.count += 1;
+            amount -= coins._DIME.value;
+        } else if(amount >= coins._NICKEL.value) {
+            coins._NICKEL.count += 1;
+            amount -= coins._NICKEL.value;
+        } else if(amount >= coins._PENNY.value) {
+            coins._PENNY.count += 1;
+            amount -= coins._PENNY.value;
+        }  
+    }
+
+    // Remove entries with 0 coins
+    let result = [];
+    for(let coin in coins) {
+        if(coins[coin].count > 0) {
+            result.push(coins[coin]);
+        }
     }
 
     return result;
@@ -87,63 +94,19 @@ function findAllCoins(amount) {
 
 function parseChange(amount) {
 
+    // Get rid of potential dollar signs in input
     if(amount.includes('$')) {
         amount = amount.replace('$', '');
     }
-    let a = parseFloat(amount);
-    if(a % 1 > 0) {
-        a *= 100;
+    // If no decimal, add it in for assumed float conversion below
+    if(!amount.includes('.')) {
+        amount += '.00';
     }
+    // convert from float to full number
+    let a = parseFloat(amount) * 100;
 
-    return a;
-}
-
-function findLargestCoin(amount) {
-    if(amount === 0) return 0;
-
-    let result;
-    // for(let i = 0; i < _COINS.length; i++) {
-    //     if(amount >= _COINS[i].value) {
-    //         result = _COINS[i];
-    //         break;
-    //     }
-    // }
-    if(amount >= _TOONIE.value) {
-        result = _TOONIE;
-        coinCount.toonie += 1;
-    } else if(amount >= _LOONIE.value) {
-        result = _LOONIE;
-        coinCount.loonie += 1;
-    } else if(amount >= _QUARTER.value) {
-        result = _QUARTER;
-        coinCount.quarter += 1;
-    } else if(amount >= _DIME.value) {
-        result = _DIME;
-        coinCount.dime += 1;
-    } else if(amount >= _NICKEL.value) {
-        result = _NICKEL;
-        coinCount.nickel += 1;
-    } else if(amount >= _PENNY.value) {
-        result = _PENNY;
-        coinCount.penny += 1;  
-    } else {
-        result = 0;
-    }
-
-    return result;
-}
-
-function resetCoinCount() {
-    coinCount = {
-        toonie: 0,
-        loonie: 0,
-        quarter: 0,
-        dime: 0,
-        nickel: 0,
-        penny: 0
-    }
-
-    return coinCount;
+    // return rounded to remove float's lack of precision
+    return a.toFixed();
 }
 
 // ENTRY / UI HOOK
@@ -155,82 +118,54 @@ document.addEventListener("DOMContentLoaded", function(e) {
 
     if(changeBtn) {
         changeBtn.addEventListener("click", function(evt) {
-            evt.preventDefault();          
+            evt.preventDefault();    
+            // Get DOM elements      
             let inputElement = document.querySelector('#amountInput');
-            let outputElement = document.querySelector('#output');
-            if(outputElement) {
-                outputElement.innerHTML = '';
-            }            
+            let outputElement = document.querySelector('#output');    
             if(!inputElement) {
                 console.log(`No input element for #amountInput - Event: ${evt}`);
                 return;
             }
+            if(!outputElement) {
+                console.log(`No output element for #output - Event: ${evt}`);
+            }
+            // Clear current output, if any present
+            outputElement.innerHTML = ''; 
+
+            // Get amount of change from DOM
             let amount = parseChange(inputElement.value);
             if(amount == 'NaN') {
                 alert("Not a valid number :(");
                 console.log(`Input: ${inputElement.value} produced ${amount}`);
                 return;
             }
-            let coins = findAllCoins(amount);
-            let msg = `Coins are `;
-            if(coinCount.toonie > 0) {
-                msg += `${coinCount.toonie} toonie`;
-                if(coinCount.toonie > 1) {
-                    msg += `s`;
-                }
-                msg += `, `;
-            }
-            if(coinCount.loonie > 0) {
-                msg += `${coinCount.loonie} loonie`;
-                if(coinCount.loonie > 1) {
-                    msg += `s`;
-                }
-                msg += `, `;
-            }
-            if(coinCount.quarter > 0) {
-                msg += `${coinCount.quarter} quarter`;
-                if(coinCount.quarter > 1) {
-                    msg += `s`;
-                }
-                msg += `, `;
-            }
-            if(coinCount.dime > 0) {
-                msg += `${coinCount.dime} dime`;
-                if(coinCount.dime > 1) {
-                    msg += `s`;
-                }
-                msg += `, `;
-            }
-            if(coinCount.nickel > 0) {
-                msg += `${coinCount.nickel} nickel`;
-                if(coinCount.nickel > 1) {
-                    msg += `s`;
-                }
-                msg += `, `;
-            }   
-            if(coinCount.penny > 0) {
-                msg += `and ${coinCount.penny} penn`;
-                if(coinCount.penny > 1) {
-                    msg += `ies.`;
-                } else {
-                    msg += 'y.';
-                }
-            }                             
+            let change = getChange(amount);
+            let msg = `Change is `;      
 
-            // let msg = 'Coins are ${}';
-            // for(let i = 0; i < coins.length; i++) {
-            //     if(i < coins.length - 1) {
-            //         msg += `a ${coins[i].name}, `;
-            //     } else if(i == coins.length - 1) {
-            //         msg += `and a ${coins[i].name}.`
-            //     }
-            // }
+            for(let i = 0; i < change.length; i++) {
+                // Only if it's the last entry and collection has more than 1 entry
+                if(i + 1 == change.length && i != 0) {
+                    msg += `, and `;
+                } else if(i != 0) { // collection has more than 1 entry and is not the first
+                    msg += `, `;
+                }
+                // number of specific coin
+                msg += `${change[i].count} `;
+                if(change[i].count > 1) { // plural language
+                    msg += `${change[i].name.plural}`;
+                } else { // else singular language
+                    msg += `${change[i].name.single}`;
+                }
+                if(i + 1 == change.length) { // ends the sentence with a period.
+                    msg += `. `;
+                }
+            }
 
             console.log(msg);
             if(outputElement) {
                 outputElement.innerHTML += msg;
             }
-            coinCount = resetCoinCount();            
+                       
         })
     }
 });
